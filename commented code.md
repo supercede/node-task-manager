@@ -49,3 +49,58 @@ db.collection('users').findOne({ _id: new ObjectID('5d88ba4984512935a0c80625') }
 
         console.log(user);
 })
+
+#mongoose create
+
+const Task = mongoose.model('Task', {
+    description: {
+        type: String
+    },
+    completed: {
+        type: Boolean
+    }
+})
+
+const User = mongoose.model('User', {
+    name: {
+        type: String
+    },
+    age: {
+        type: Number
+    }
+})
+
+const person = new User({
+    name: 'Ajagun',
+    age: 35
+})
+
+person.save().then(data => console.log(data))
+    .catch(err => console.log(err));
+
+    const myTask = new Task({
+    description: 'Buy food',
+    completed: 'yabadabadoo'
+})
+
+
+
+const myTask = new Task({
+    description: 'Buy food',
+    completed: 'yabadabadoo'
+})
+
+myTask.save()
+        .then(res => console.log(res))
+        .catch(err => console.log(`failed because of ${err.message}`))
+
+
+const person = new User({
+    name: '    idris1034',
+    email: '    idris@devcareers.io       ',
+    password: 'hrjr880       '
+})
+
+person.save().then(data => console.log(data))
+    .catch(err => console.log(err));
+
