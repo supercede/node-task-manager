@@ -1,82 +1,94 @@
-const express = require('express');
-const User = require('../models/user');
+const express = require("express");
+const User = require("../models/user");
+const auth = require("../middleware/auth");
 
 const router = express.Router();
 
-router.post('/users', async (req, res) => {
-    const user = new User(req.body);
-    // console.log(req.body)
-    try {
-        const token = await user.generateToken();
-        await user.save();
-        res.status(201).send({ user, token });
-    } catch (err) {
-        res.status(400).send(err.message);
-    }
-})
+router.post("/users", async (req, res) => {
+  const user = new User(req.body);
+  // console.log(req.body)
+  try {
+    const token = await user.generateToken();
+    await user.save();
+    res.status(201).send({ user, token });
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
 
-router.post('/users/login', async (req, res) => {
-    try {
-        const user = await User.findUserByCredentials(req.body.email, req.body.password);
-        const token = await user.generateToken();
-        return res.json({user, token});
-    } catch (err) {
-        res.status(400).send('Unable to login');
-    }
-})
+router.post("/users/login", async (req, res) => {
+  try {
+    const user = await User.findUserByCredentials(
+      req.body.email,
+      req.body.password
+    );
+    const token = await user.generateToken();
+    return res.json({ user, token });
+  } catch (err) {
+    res.status(400).send("Unable to login");
+  }
+});
 
-router.get('/users', async (req, res) => {
-    try {
-        const users = await User.find();
-        res.send(users);
-    }
-    catch (err) {
-        res.status(500).send(err.message);
-    }
-})
+router.post("/users/logout", auth, async (req, res) => {
+  try {
+    req.user.tokens = req.user.tokens.filter(
+      token => token.token !== req.token
+    );
+    await req.user.save();
+    res.status(200).send("Done");
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
-router.get('/users/:id', async (req, res) => {
-    const _id = req.params.id;
+router.post("/users/logoutAll", auth, async (req, res) => {
+  try {
+    req.user.tokens = [];
+    await req.user.save();
+    res.status(200).send(req.user);
+  } catch (err) {
+    res.send(err);
+  }
+});
 
-    try {
-        const user = await User.findById(_id)
-        return !user ? res.status(404).send('User not found') : res.send(user);
+router.get("/users/me", auth, async (req, res) => {
+  try {
+    res.send(req.user);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
-    } catch (err) {
-        res.status(406).send('Please use a valid id')
-    }
-})
+router.patch("/users/me", auth, async (req, res) => {
+  const allowedParams = Object.keys(User.schema.obj);
+  const givenParams = Object.keys(req.body);
+  let isAllowed = givenParams.every(param => allowedParams.includes(param));
 
-router.patch('/users/:id', async (req, res) => {
-    const allowedParams = Object.keys(User.schema.obj);
-    const givenParams = Object.keys(req.body);
-    let isAllowed = givenParams.every(param => allowedParams.includes(param));
+  if (!isAllowed) {
+    return res
+      .status(400)
+      .send("Invalid, Valid fields are: name, age, password or email");
+  }
 
-    if (!isAllowed) {
-        return res.status(400).send('Invalid, Valid fields are: name, age, password or email')
-    }
+  try {
+    const user = req.user;
 
-    const _id = req.params.id;
-    try {
-        const user = await User.findById(_id);
+    givenParams.forEach(param => (user[param] = req.body[param]));
 
-        givenParams.forEach(param => user[param] = req.body[param]);
+    await user.save();
+    res.send({ message: "Updated Profile Successfully", user });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
-        await user.save();
-        return !user ? res.status(404).send('User not found') : res.send(user);
-    } catch (err) {
-        res.status(500).send(err.message)
-    }
-})
-
-router.delete('/users/:id', async (req, res) => {
-    const _id = req.params.id;
-    try {
-        const user = await User.findByIdAndDelete(_id)
-        return !user ? res.status(404).send('User not Found') : res.send(user);
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-})
+router.delete("/users/me", auth, async (req, res) => {
+  try {
+    await req.user.remove();
+    res.send({ message: "User Deleted", user: req.user });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
 module.exports = router;
