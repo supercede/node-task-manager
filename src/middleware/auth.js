@@ -14,7 +14,7 @@ const auth = async (req, res, next) => {
     });
 
     if (!user) {
-      throw new Error("Please recheck details");
+      throw new Error("Unauthorized");
     }
 
     req.token = token;

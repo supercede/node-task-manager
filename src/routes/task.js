@@ -17,20 +17,33 @@ router.post("/tasks", auth, async (req, res) => {
   }
 });
 
-// router.get("/tasks", async (req, res) => {
-//   try {
-//     const tasks = await Task.find();
-//     res.send(tasks);
-//   } catch (err) {
-//     res.status(500).send(err.message);
-//   }
-// });
-
+//With Pagination, sorting and limiting 
 router.get("/tasks", auth, async (req, res) => {
+  const match = {};
+  const sort = {};
+
+  if(req.query.completed){
+    match.completed = req.query.completed === 'true';
+  }
+
+  if(req.query.sortBy){
+    const parts = req.query.sortBy.split(':');
+    const field = parts[0];
+    const param = parts[1];
+    let val = param === 'asc' ? 1 : -1;
+    sort[field] = val;
+  }
   try {
     const user = req.user;
-    await user.populate("tasks").execPopulate();
-    // const tasks = await Task.find({ user: req.user._id });
+    await user.populate({
+      path: 'tasks',
+      match,
+      options: {
+        limit: parseInt(req.query.limit),
+        skip: parseInt(req.query.skip),
+        sort
+      }
+    }).execPopulate();
     res.send(user.tasks);
   } catch (err) {
     res.status(500).send(err.message);

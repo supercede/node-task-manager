@@ -49,6 +49,8 @@ const userSchema = new mongoose.Schema({
       }
     }
   ]
+}, {
+  timestamps: true
 });
 
 //Foreign field is the propery name on the ref (Task) mdodel that will set up the relationship
@@ -74,18 +76,18 @@ userSchema.methods.generateToken = async function() {
 userSchema.methods.toJSON = function() {
   const user = this;
 
-  const newUser = {
-    name: user.name,
-    email: user.email,
-    age: user.age
-  };
+  // const newUser = {
+  //   name: user.name,
+  //   email: user.email,
+  //   age: user.age
+  // };
 
-  return newUser;
+  // return newUser;
 
-  // userObj = user.toObject();
-  // delete userObj.password;
-  // delete userObj.tokens;
-  // return userObj;
+  userObj = user.toObject();
+  delete userObj.password;
+  delete userObj.tokens;
+  return userObj;
 };
 
 userSchema.statics.findUserByCredentials = async (email, password) => {
