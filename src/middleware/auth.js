@@ -23,7 +23,7 @@ const auth = async (req, res, next) => {
   } catch (err) {
     return res
       .status(401)
-      .send({ error: "You are not permitted to do this: " + err.message });
+      .send({ error: "You are not authorized to do this" });
   }
 };
 
