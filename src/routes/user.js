@@ -9,7 +9,6 @@ const router = express.Router();
 
 router.post("/users", async (req, res) => {
   const user = new User(req.body);
-  // console.log(req.body)
   try {
     const token = await user.generateToken();
     await user.save();
