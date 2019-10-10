@@ -8,7 +8,7 @@ const welcomeMail = (email, name) => {
         to: email,
         from: 'mahyor.sam@gmail.com',
         subject: "Welcome to Destiny's task app",
-        text: `Hello ${name}, thanks for joining`
+        text: `Hello ${name}, You Thanks for registering, Do make good use of your time with us, and complete those tasks. :)`
     })
 }
 
