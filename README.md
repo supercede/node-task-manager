@@ -20,3 +20,8 @@ JWT is used to validate users on log in. Users can log out with the '/logout' ro
 
 Routes: 
 Check [Documentation](https://documenter.getpostman.com/view/8630438/SVtVSn4o?version=latest)
+
+# Notes
+* Create an accout with the POST /user route,
+* You need to have an account and be logged in to create, edit or delete a task or an avatar
+* E-mail notifications are sent upon creation or deletion of user accounts
