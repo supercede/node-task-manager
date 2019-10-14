@@ -18,8 +18,8 @@ JWT is used to validate users on log in. Users can log out with the '/logout' ro
 * 401 - Unauthorized
 * 403 - Forbidden
 
-Routes: 
-Check [Documentation](https://documenter.getpostman.com/view/8630438/SVtVSn4o?version=latest)
+# Routes: 
+* Check [Documentation](https://documenter.getpostman.com/view/8630438/SVtVSn4o?version=latest)
 
 # Notes
 * Create an accout with the POST /user route,
