@@ -1,4 +1,17 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true, useFindAndModify: false });
+const db =
+  process.env.NODE_ENV === "test"
+    ? process.env.TEST_MONGO_URL
+    : process.env.MONGO_URL;
 
+mongoose
+  .connect(db, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false
+  })
+  .then(() => {
+    console.log(`connected to db ${db}`);
+  });

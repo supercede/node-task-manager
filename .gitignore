@@ -1,3 +1,6 @@
 node_modules
 playground
-.env
+*.env
+commented_code.md
+src/math.js
+tests/myTest.test.js
