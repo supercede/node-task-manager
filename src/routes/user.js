@@ -1,17 +1,17 @@
 const express = require("express");
-const multer = require('multer');
-const sharp = require('sharp');
+const multer = require("multer");
+const sharp = require("sharp");
 const User = require("../models/user");
 const auth = require("../middleware/auth");
-const { welcomeMail, farewellMail } = require('../emails/account');
+const { welcomeMail, farewellMail } = require("../emails/account");
 
 const router = express.Router();
 
 router.post("/users", async (req, res) => {
   const user = new User(req.body);
   try {
-    const token = await user.generateToken();
     await user.save();
+    const token = await user.generateToken();
     welcomeMail(user.email, user.name);
     res.status(201).send({ user, token });
   } catch (err) {
@@ -58,7 +58,7 @@ router.get("/users/me", auth, async (req, res) => {
   try {
     res.send(req.user);
   } catch (err) {
-    res.status(500).send('You need to be logged in to perform this operation');
+    res.status(500).send("You need to be logged in to perform this operation");
   }
 });
 
@@ -70,7 +70,9 @@ router.patch("/users/me", auth, async (req, res) => {
   if (!isAllowed) {
     return res
       .status(400)
-      .send("Invalid, Valid fields are: name, age, password or email");
+      .send({
+        message: "Invalid, Valid fields are: name, age, password or email"
+      });
   }
 
   try {
@@ -79,7 +81,7 @@ router.patch("/users/me", auth, async (req, res) => {
     givenParams.forEach(param => (user[param] = req.body[param]));
 
     await user.save();
-    res.send({ message: "Updated Profile Successfully", user });
+    res.status(200).send({ message: "Updated Profile Successfully", user });
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -100,49 +102,57 @@ const avatar = multer({
   limits: {
     fileSize: 1000000
   },
-  fileFilter(req, file, cb){
-    if(!file.originalname.match(/\.(jpg|png|jpeg)$/)){
-      return cb(new Error('Please upload an image'));
+  fileFilter(req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|png|jpeg)$/)) {
+      return cb(new Error("Please upload an image"));
     }
-    
+
     cb(undefined, true);
   }
-})
+});
 
-router.post("/users/me/avatar", auth, avatar.single('avatar'), async (req, res) => {  
-  if( req.file == undefined){
-      return res.status(400).send('Please upload an image');
-  }
-  
-  const buffer = await sharp(req.file.buffer).png().resize({ width: 250, height: 250 }).toBuffer();
+router.post(
+  "/users/me/avatar",
+  auth,
+  avatar.single("avatar"),
+  async (req, res) => {
+    if (req.file == undefined) {
+      return res.status(400).send("Please upload an image");
+    }
+
+    const buffer = await sharp(req.file.buffer)
+      .png()
+      .resize({ width: 250, height: 250 })
+      .toBuffer();
     req.user.avatar = buffer;
     await req.user.save();
-    res.status(200).send('file uploaded');
-}, (err, req, res, next) => {
-  res.status(400).send(err.message);
-})
+    res.status(200).send("file uploaded");
+  },
+  (err, req, res, next) => {
+    res.status(400).send(err.message);
+  }
+);
 
-router.delete("/users/me/avatar", auth, async(req, res) => {
+router.delete("/users/me/avatar", auth, async (req, res) => {
   req.user.avatar = undefined;
   await req.user.save();
   return res.status(200).send(req.user);
-})
+});
 
-router.get('/users/:id/avatar', async(req, res) => {
+router.get("/users/:id/avatar", async (req, res) => {
   const id = req.params.id;
-  try{
+  try {
     const user = await User.findById(id);
 
-    if(!user || !user.avatar){
-      throw new Error('Image does not exist');
+    if (!user || !user.avatar) {
+      throw new Error("Image does not exist");
     }
 
-    res.setHeader('Content-Type', 'image/png');
-    res.status(200).send(user.avatar)
-  }catch(err){
+    res.setHeader("Content-Type", "image/png");
+    res.status(200).send(user.avatar);
+  } catch (err) {
     res.status(400).send(err.message);
   }
-})
-
+});
 
 module.exports = router;

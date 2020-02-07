@@ -29,6 +29,7 @@
   "devDependencies": {
     "cross-env": "^7.0.0",
     "env-cmd": "^8.0.2",
-    "jest": "^25.1.0"
+    "jest": "^23.6.0",
+    "supertest": "^4.0.2"
   }
 }
