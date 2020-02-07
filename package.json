@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "test": "cross-env NODE_ENV=test jest --watch"
+    "test": "cross-env NODE_ENV=test jest --watch --runInBand"
   },
   "jest": {
     "testEnvironment": "node"

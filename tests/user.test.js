@@ -1,55 +1,15 @@
 const request = require("supertest");
-const jwt = require("jsonwebtoken");
-const mongoose = require("mongoose");
 require("dotenv").config();
 const app = require("../src/app");
 const User = require("../src/models/user");
-// const Task = require("../src/models/task");
-
-const userOneId = new mongoose.Types.ObjectId();
-const userOne = {
-  _id: userOneId,
-  name: "Clark Kent",
-  email: "superman@kryptic.com",
-  password: "manofSt33l",
-  tokens: [
-    {
-      token: jwt.sign({ _id: userOneId }, process.env.JWT_SECRET_KEY)
-    }
-  ]
-};
-
-// const userTwoId = new mongoose.Types.ObjectId();
-// const userTwo = {
-//   _id: userTwoId,
-//   name: "Lois Lane",
-//   email: "mslane@kryptic.com",
-//   password: "l0islan3",
-//   tokens: [
-//     {
-//       token: jwt.sign({ _id: userTwoId }, process.env.JWT_SECRET_KEY)
-//     }
-//   ]
-// };
-
-// const taskOne = {
-//   _id: new mongoose.Types.ObjectId();
-//   description: 'First Task',
-//   owner: userOne._id
-// }
-
-console.log(process.env.JWT_SECRET_KEY);
+const { userOne, userOneId, setupDB } = require("./fixtures/db");
 
 beforeAll(done => {
   require("../src/db/mongoose");
   done();
 });
 
-beforeEach(async () => {
-  await User.deleteMany();
-  await new User(userOne).save();
-  // await new User(userTwo).save();
-});
+beforeEach(setupDB);
 
 test("should sign up a new user", async () => {
   const response = await request(app)
