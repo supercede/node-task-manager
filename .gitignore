@@ -3,4 +3,4 @@ playground
 *.env
 commented_code.md
 src/math.js
-tests/myTest.test.js
+tests/myTest.test.example.js
